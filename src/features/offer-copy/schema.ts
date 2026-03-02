@@ -1,4 +1,4 @@
-import { z } from 'zod'
+﻿import { z } from 'zod'
 
 export const OFFER_COPY_TONES = ['专业', '简洁', '活泼', '高级'] as const
 

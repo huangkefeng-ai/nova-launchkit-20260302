@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useMemo, useState, type FormEvent } from 'react'
@@ -11,22 +11,25 @@ type AuthFormProps = {
   mode: AuthMode
 }
 
-const copyByMode: Record<AuthMode, { title: string; subtitle: string; submitLabel: string; altHref: string; altText: string; altLinkLabel: string }> = {
+const copyByMode: Record<
+  AuthMode,
+  { title: string; subtitle: string; submitLabel: string; altHref: string; altText: string; altLinkLabel: string }
+> = {
   'sign-in': {
-    title: 'Sign in',
-    subtitle: 'Access your AI Offer Copy Studio workspace.',
-    submitLabel: 'Sign in',
+    title: '登录 Nova LaunchKit',
+    subtitle: '继续使用 AI Offer Copy Studio 工作台。',
+    submitLabel: '登录',
     altHref: '/sign-up',
-    altText: 'Need an account?',
-    altLinkLabel: 'Create one',
+    altText: '还没有账号？',
+    altLinkLabel: '立即注册',
   },
   'sign-up': {
-    title: 'Create account',
-    subtitle: 'Start using AI Offer Copy Studio in minutes.',
-    submitLabel: 'Sign up',
+    title: '创建 Nova LaunchKit 账号',
+    subtitle: '几分钟内完成开通并进入增长面板。',
+    submitLabel: '注册',
     altHref: '/sign-in',
-    altText: 'Already have an account?',
-    altLinkLabel: 'Sign in',
+    altText: '已经有账号？',
+    altLinkLabel: '去登录',
   },
 }
 
@@ -75,9 +78,9 @@ export function AuthForm({ mode }: AuthFormProps) {
         return
       }
 
-      setInfo('Account created. Check your email for a confirmation link, then sign in.')
+      setInfo('账号已创建，请前往邮箱完成确认后再登录。')
     } catch (submitError) {
-      const message = submitError instanceof Error ? submitError.message : 'Unable to authenticate right now.'
+      const message = submitError instanceof Error ? submitError.message : '当前无法完成认证，请稍后重试。'
       setError(message)
     } finally {
       setIsSubmitting(false)
@@ -91,7 +94,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-zinc-200">Email</span>
+          <span className="mb-1 block text-sm font-medium text-zinc-200">邮箱</span>
           <input
             className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none ring-emerald-500/70 transition focus:ring-2"
             type="email"
@@ -103,7 +106,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-zinc-200">Password</span>
+          <span className="mb-1 block text-sm font-medium text-zinc-200">密码</span>
           <input
             className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none ring-emerald-500/70 transition focus:ring-2"
             type="password"
@@ -132,7 +135,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           type="submit"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Please wait...' : copy.submitLabel}
+          {isSubmitting ? '提交中...' : copy.submitLabel}
         </button>
       </form>
 

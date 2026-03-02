@@ -1,7 +1,7 @@
-import type { OfferCopyInput } from './schema'
+﻿import type { OfferCopyInput } from './schema'
 
 export function buildOfferCopyPrompt(input: OfferCopyInput) {
-  return `你是 SaaS 增长文案专家。根据输入生成中文营销文案。
+  return `你是 Nova LaunchKit 的 SaaS 增长文案专家。请根据输入生成中文营销文案。
 产品: ${input.product}
 目标用户: ${input.audience}
 核心价值: ${input.valueProp}

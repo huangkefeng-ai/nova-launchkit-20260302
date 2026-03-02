@@ -1,5 +1,6 @@
-'use client'
+﻿'use client'
 
+import { History, RefreshCcw, Sparkles, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
 import { OFFER_COPY_TONES, OfferCopyOutputSchema, OfferCopySchema, type OfferCopyInput } from '@/features/offer-copy/schema'
@@ -85,6 +86,7 @@ export function OfferCopyDashboardPanel() {
       }
 
       if (!response.ok) {
+        setHistoryRequestId(null)
         const parsedError = ApiErrorSchema.safeParse(body)
         if (parsedError.success) {
           setHistoryError({
@@ -92,7 +94,7 @@ export function OfferCopyDashboardPanel() {
             requestId: parsedError.data.requestId,
           })
         } else {
-          setHistoryError({ message: '加载历史失败，请稍后再试。' })
+          setHistoryError({ message: '加载历史失败，请稍后重试。' })
         }
         setHistory([])
         return
@@ -100,6 +102,7 @@ export function OfferCopyDashboardPanel() {
 
       const parsedResponse = HistoryResponseSchema.safeParse(body)
       if (!parsedResponse.success) {
+        setHistoryRequestId(null)
         setHistoryError({ message: '历史数据格式错误。' })
         setHistory([])
         return
@@ -108,6 +111,7 @@ export function OfferCopyDashboardPanel() {
       setHistory(parsedResponse.data.items)
       setHistoryRequestId(parsedResponse.data.requestId)
     } catch {
+      setHistoryRequestId(null)
       setHistoryError({ message: '加载历史失败，请检查网络连接。' })
       setHistory([])
     } finally {
@@ -197,7 +201,7 @@ export function OfferCopyDashboardPanel() {
             requestId: parsedError.data.requestId,
           })
         } else {
-          setHistoryError({ message: '删除失败，请稍后再试。' })
+          setHistoryError({ message: '删除失败，请稍后重试。' })
         }
         return
       }
@@ -211,16 +215,23 @@ export function OfferCopyDashboardPanel() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="text-xl font-semibold">Offer Copy 生成</h2>
-        <p className="mt-2 text-sm text-zinc-300">每次生成将消耗 1 点积分，失败会自动回滚。</p>
+    <div className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="rounded-3xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-xl shadow-zinc-950/30 sm:p-7">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">生成新版 Offer Copy</h2>
+            <p className="mt-2 text-sm text-zinc-300">每次生成消耗 1 积分，失败会自动回滚。</p>
+          </div>
+          <span className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
+            输入面板
+          </span>
+        </div>
 
-        <form className="mt-5 space-y-4" onSubmit={onSubmit}>
-          <label className="flex flex-col gap-1 text-sm text-zinc-200">
-            产品
+        <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+          <label className="flex flex-col gap-1.5 text-sm text-zinc-200">
+            产品名称
             <input
-              className="rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-zinc-100 outline-none transition focus:border-emerald-500"
+              className="rounded-xl border border-zinc-700 bg-zinc-950/80 px-3 py-2.5 text-zinc-100 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               name="product"
               onChange={(event) => setForm((current) => ({ ...current, product: event.target.value }))}
               placeholder="例如：Nova LaunchKit"
@@ -228,32 +239,32 @@ export function OfferCopyDashboardPanel() {
             />
           </label>
 
-          <label className="flex flex-col gap-1 text-sm text-zinc-200">
+          <label className="flex flex-col gap-1.5 text-sm text-zinc-200">
             目标受众
             <input
-              className="rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-zinc-100 outline-none transition focus:border-emerald-500"
+              className="rounded-xl border border-zinc-700 bg-zinc-950/80 px-3 py-2.5 text-zinc-100 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               name="audience"
               onChange={(event) => setForm((current) => ({ ...current, audience: event.target.value }))}
-              placeholder="例如：独立开发者"
+              placeholder="例如：独立开发者与小型增长团队"
               value={form.audience}
             />
           </label>
 
-          <label className="flex flex-col gap-1 text-sm text-zinc-200">
+          <label className="flex flex-col gap-1.5 text-sm text-zinc-200">
             核心价值
             <textarea
-              className="min-h-24 rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-zinc-100 outline-none transition focus:border-emerald-500"
+              className="min-h-24 rounded-xl border border-zinc-700 bg-zinc-950/80 px-3 py-2.5 text-zinc-100 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               name="valueProp"
               onChange={(event) => setForm((current) => ({ ...current, valueProp: event.target.value }))}
-              placeholder="例如：一周内完成可上线的 SaaS MVP"
+              placeholder="例如：一周内上线可投放的 SaaS MVP，并具备 AI 文案能力"
               value={form.valueProp}
             />
           </label>
 
-          <label className="flex flex-col gap-1 text-sm text-zinc-200">
-            语气
+          <label className="flex flex-col gap-1.5 text-sm text-zinc-200">
+            文案语气
             <select
-              className="rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-zinc-100 outline-none transition focus:border-emerald-500"
+              className="rounded-xl border border-zinc-700 bg-zinc-950/80 px-3 py-2.5 text-zinc-100 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               name="tone"
               onChange={(event) =>
                 setForm((current) => ({ ...current, tone: event.target.value as OfferCopyInput['tone'] }))
@@ -269,41 +280,50 @@ export function OfferCopyDashboardPanel() {
           </label>
 
           <button
-            className="w-full rounded-lg bg-emerald-500 px-4 py-2 font-medium text-emerald-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-emerald-800 disabled:text-zinc-300"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:bg-emerald-700 disabled:text-zinc-200"
             disabled={isSubmitting}
             type="submit"
           >
-            {isSubmitting ? '生成中...' : '生成 Offer Copy'}
+            <Sparkles className="h-4 w-4" />
+            {isSubmitting ? '正在生成...' : '生成 Offer Copy'}
           </button>
         </form>
 
         {submitError ? (
-          <div className="mt-4 rounded-lg border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-100">
+          <div className="mt-4 rounded-xl border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-100">
             <p>{submitError.message}</p>
             {submitError.requestId ? <p className="mt-1 text-xs">requestId: {submitError.requestId}</p> : null}
           </div>
         ) : null}
       </section>
 
-      <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="text-xl font-semibold">生成结果</h2>
+      <section className="rounded-3xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-xl shadow-zinc-950/30 sm:p-7">
+        <h2 className="text-2xl font-semibold tracking-tight">输出结果预览</h2>
 
         {!result ? (
-          <p className="mt-3 text-sm text-zinc-400">提交表单后将在此显示 headline、subheadline、bullets 和 CTA。</p>
+          <div className="mt-5 rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/70 p-5 text-sm text-zinc-300">
+            <p className="font-medium text-zinc-200">提交后这里会展示：</p>
+            <ul className="mt-3 space-y-2">
+              <li>主标题（Headline）</li>
+              <li>副标题（Subheadline）</li>
+              <li>3 条核心卖点（Bullets）</li>
+              <li>行动按钮文案（CTA）</li>
+            </ul>
+          </div>
         ) : (
-          <article className="mt-4 space-y-4 rounded-xl border border-zinc-700 bg-zinc-950/70 p-4">
+          <article className="mt-5 space-y-4 rounded-2xl border border-zinc-700 bg-zinc-950/80 p-5">
             <div className="text-xs text-zinc-400">requestId: {result.requestId}</div>
             <div>
-              <p className="text-xs uppercase tracking-wider text-zinc-400">Headline</p>
+              <p className="text-xs uppercase tracking-wider text-zinc-400">主标题</p>
               <p className="mt-1 text-lg font-semibold text-zinc-100">{result.output.headline}</p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider text-zinc-400">Subheadline</p>
+              <p className="text-xs uppercase tracking-wider text-zinc-400">副标题</p>
               <p className="mt-1 text-zinc-200">{result.output.subheadline}</p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider text-zinc-400">Bullets</p>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-zinc-200">
+              <p className="text-xs uppercase tracking-wider text-zinc-400">卖点</p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-5 text-zinc-200">
                 {result.output.bullets.map((bullet, index) => (
                   <li key={`${bullet}-${index}`}>{bullet}</li>
                 ))}
@@ -317,49 +337,57 @@ export function OfferCopyDashboardPanel() {
         )}
       </section>
 
-      <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 lg:col-span-2">
+      <section className="rounded-3xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-xl shadow-zinc-950/30 sm:p-7 xl:col-span-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold">最近生成历史</h2>
+          <div>
+            <h2 className="inline-flex items-center gap-2 text-2xl font-semibold tracking-tight">
+              <History className="h-5 w-5 text-emerald-300" />
+              最近生成历史
+            </h2>
+            <p className="mt-1 text-sm text-zinc-300">便于快速回看近期文案版本与生成时间。</p>
+          </div>
           <button
-            className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-800"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-3.5 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isLoadingHistory}
             onClick={() => void loadHistory()}
             type="button"
           >
-            {isLoadingHistory ? '刷新中...' : '刷新'}
+            <RefreshCcw className={`h-4 w-4 ${isLoadingHistory ? 'animate-spin' : ''}`} />
+            {isLoadingHistory ? '刷新中...' : '刷新历史'}
           </button>
         </div>
 
         {historyRequestId ? <p className="mt-2 text-xs text-zinc-400">requestId: {historyRequestId}</p> : null}
 
         {historyError ? (
-          <div className="mt-4 rounded-lg border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-100">
+          <div className="mt-4 rounded-xl border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-100">
             <p>{historyError.message}</p>
             {historyError.requestId ? <p className="mt-1 text-xs">requestId: {historyError.requestId}</p> : null}
           </div>
         ) : null}
 
         {isLoadingHistory ? (
-          <p className="mt-4 text-sm text-zinc-400">正在加载历史...</p>
+          <p className="mt-4 text-sm text-zinc-400">正在加载历史记录...</p>
         ) : history.length === 0 ? (
-          <p className="mt-4 text-sm text-zinc-400">暂无历史记录。</p>
+          <p className="mt-4 text-sm text-zinc-400">暂无历史记录，先生成第一条文案吧。</p>
         ) : (
           <div className="mt-4 space-y-3">
             {history.map((item) => (
               <article
-                className="flex flex-col gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 md:flex-row md:items-center md:justify-between"
+                className="grid gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 md:grid-cols-[1fr_auto] md:items-center"
                 key={item.id}
               >
                 <div>
-                  <p className="text-sm text-zinc-200">{item.output?.headline || '（无可用标题）'}</p>
-                  <p className="mt-1 text-xs text-zinc-400">{formatDate(item.created_at)}</p>
+                  <p className="text-sm font-medium leading-6 text-zinc-100">{item.output?.headline || '（未命名文案）'}</p>
+                  <p className="mt-1 text-xs text-zinc-400">生成时间：{formatDate(item.created_at)}</p>
                 </div>
                 <button
-                  className="rounded-lg border border-red-500/40 px-3 py-1.5 text-sm text-red-200 transition hover:border-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-1 rounded-lg border border-red-500/40 px-3 py-1.5 text-sm text-red-200 transition hover:border-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={deletingId === item.id}
                   onClick={() => void onDelete(item.id)}
                   type="button"
                 >
+                  <Trash2 className="h-3.5 w-3.5" />
                   {deletingId === item.id ? '删除中...' : '删除'}
                 </button>
               </article>
