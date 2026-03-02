@@ -1,5 +1,11 @@
 import type { OfferCopyInput } from './schema'
 
 export function buildOfferCopyPrompt(input: OfferCopyInput) {
-  return `你是SaaS增长文案专家。根据输入生成中文营销文案。\n产品:${input.product}\n目标用户:${input.audience}\n核心价值:${input.valueProp}\n语气:${input.tone}\n\n输出JSON: {headline, subheadline, bullets:[3], cta}`
+  return `你是 SaaS 增长文案专家。根据输入生成中文营销文案。
+产品: ${input.product}
+目标用户: ${input.audience}
+核心价值: ${input.valueProp}
+语气: ${input.tone}
+
+只输出 JSON: {"headline": string, "subheadline": string, "bullets": [string, string, string], "cta": string}`
 }

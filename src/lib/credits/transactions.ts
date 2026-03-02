@@ -35,7 +35,7 @@ type ConsumeCreditsRpcRow = {
   balance: number | null
 }
 
-type ConsumeCreditsStatus =
+type CreditsRpcStatus =
   | 'OK'
   | 'INSUFFICIENT_CREDITS'
   | 'DUPLICATE_REQUEST'
@@ -50,7 +50,7 @@ export type ConsumeCreditsResult =
     }
   | {
       ok: false
-      status: Exclude<ConsumeCreditsStatus, 'OK'>
+      status: Exclude<CreditsRpcStatus, 'OK'>
       balance?: number
     }
 
@@ -83,11 +83,64 @@ export async function consumeCredits(input: ConsumeCreditsInput): Promise<Consum
     return { ok: false, status: 'INTERNAL_ERROR' }
   }
 
-  switch (row.status) {
+  switch (row.status as CreditsRpcStatus) {
     case 'OK':
       return { ok: true, status: 'OK', balance: row.balance ?? 0 }
     case 'INSUFFICIENT_CREDITS':
       return { ok: false, status: 'INSUFFICIENT_CREDITS', balance: row.balance ?? 0 }
+    case 'DUPLICATE_REQUEST':
+      return { ok: false, status: 'DUPLICATE_REQUEST', balance: row.balance ?? 0 }
+    case 'INVALID_AMOUNT':
+      return { ok: false, status: 'INVALID_AMOUNT' }
+    default:
+      return { ok: false, status: 'INTERNAL_ERROR' }
+  }
+}
+
+export type RollbackCreditsInput = {
+  userId: string
+  amount: number
+  reason: string
+  requestId: string
+}
+
+export type RollbackCreditsResult =
+  | {
+      ok: true
+      status: 'OK'
+      balance: number
+    }
+  | {
+      ok: false
+      status: Exclude<CreditsRpcStatus, 'OK' | 'INSUFFICIENT_CREDITS'>
+      balance?: number
+    }
+
+export async function rollbackCredits(input: RollbackCreditsInput): Promise<RollbackCreditsResult> {
+  if (!Number.isInteger(input.amount) || input.amount <= 0) {
+    return { ok: false, status: 'INVALID_AMOUNT' }
+  }
+
+  const supabase = createServiceRoleSupabase()
+  const { data, error } = await supabase.rpc('rollback_credits', {
+    p_user_id: input.userId,
+    p_amount: input.amount,
+    p_reason: input.reason,
+    p_request_id: input.requestId,
+  })
+
+  if (error) {
+    return { ok: false, status: 'INTERNAL_ERROR' }
+  }
+
+  const row = Array.isArray(data) ? (data[0] as ConsumeCreditsRpcRow | undefined) : undefined
+  if (!row || typeof row.status !== 'string') {
+    return { ok: false, status: 'INTERNAL_ERROR' }
+  }
+
+  switch (row.status as CreditsRpcStatus) {
+    case 'OK':
+      return { ok: true, status: 'OK', balance: row.balance ?? 0 }
     case 'DUPLICATE_REQUEST':
       return { ok: false, status: 'DUPLICATE_REQUEST', balance: row.balance ?? 0 }
     case 'INVALID_AMOUNT':

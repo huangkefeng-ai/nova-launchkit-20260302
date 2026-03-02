@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { OfferCopyDashboardPanel } from '@/features/offer-copy/components/offer-copy-dashboard-panel'
 import { createServerSupabase } from '@/utils/supabase/server'
 
 export default async function DashboardPage() {
@@ -41,12 +42,7 @@ export default async function DashboardPage() {
           </form>
         </header>
 
-        <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-          <h2 className="text-xl font-semibold">Workspace Shell</h2>
-          <p className="mt-2 text-zinc-300">
-            This authenticated shell is ready for upcoming Offer Copy generation, credits, and history modules.
-          </p>
-        </section>
+        <OfferCopyDashboardPanel />
       </div>
     </main>
   )
