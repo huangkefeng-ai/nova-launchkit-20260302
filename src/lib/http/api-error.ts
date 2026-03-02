@@ -4,7 +4,10 @@ export type ApiErrorCode =
   | 'UNAUTHORIZED'
   | 'FORBIDDEN'
   | 'INVALID_INPUT'
+  | 'INVALID_SIGNATURE'
   | 'NOT_FOUND'
+  | 'CONFLICT'
+  | 'INSUFFICIENT_CREDITS'
   | 'RATE_LIMITED'
   | 'INTERNAL_ERROR'
 
